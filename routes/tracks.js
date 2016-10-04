@@ -3,7 +3,7 @@
 const boom = require('boom');
 const express = require('express');
 const knex = require('../knex');
-const { camelizeKeys } = require('humps');
+const { camelizeKeys, decamelizeKeys } = require('humps');
 
 const router = express.Router();
 
@@ -30,6 +30,35 @@ router.get('/tracks/:id', (req, res, next) => {
       }
 
       const track = camelizeKeys(row);
+
+      res.send(track);
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+router.post('/tracks', (req, res, next) => {
+  const { title, artist, likes } = req.body;
+
+  if (!title || !title.trim()) {
+    return next(boom.create(400, 'Title must not be blank'));
+  }
+
+  if (!artist || !artist.trim()) {
+    return next(boom.create(400, 'Artist must not be blank'));
+  }
+
+  if (!Number.isInteger(likes)) {
+    return next(boom.create(400, 'Likes must be an integer'));
+  }
+
+  const insertTrack = { title, artist, likes };
+
+  knex('tracks')
+    .insert(decamelizeKeys(insertTrack), '*')
+    .then((rows) => {
+      const track = camelizeKeys(rows[0]);
 
       res.send(track);
     })
