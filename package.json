@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "boom": "^4.1.0",
     "express": "^4.14.0",
     "humps": "^1.1.0",
     "knex": "^0.12.2",
