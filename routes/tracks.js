@@ -67,4 +67,38 @@ router.post('/tracks', (req, res, next) => {
     });
 });
 
+router.patch('/tracks/:id', (req, res, next) => {
+  knex('tracks')
+    .where('id', req.params.id)
+    .first()
+    .then((track) => {
+      if (!track) {
+        throw boom.create(404, 'Not Found');
+      }
+
+      const { title, artist } = req.body;
+      const updateTrack = {};
+
+      if (title) {
+        updateTrack.title = title;
+      }
+
+      if (artist) {
+        updateTrack.artist = artist;
+      }
+
+      return knex('tracks')
+        .update(decamelizeKeys(updateTrack), '*')
+        .where('id', req.params.id);
+    })
+    .then((rows) => {
+      const track = camelizeKeys(rows[0]);
+
+      res.send(track);
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
 module.exports = router;
